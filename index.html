@@ -162,6 +162,26 @@
                     <span class="btn-icon">🎯</span>
                 </button>
 
+                <div class="form-group codigo-ativacao-container" id="codigoAtivacaoContainer">
+                    <label for="codigoAtivacao" class="label">
+                        <span class="label-number">🔓</span>
+                        Código de Ativação (opcional)
+                    </label>
+                    <div class="codigo-input-wrapper">
+                        <input 
+                            type="text" 
+                            id="codigoAtivacao" 
+                            class="input codigo-input"
+                            placeholder="Digite seu código de ativação para desbloquear jogos ilimitados"
+                            aria-label="Código de ativação"
+                        >
+                        <button type="button" class="btn-ativar" id="btnAtivar" title="Ativar código">
+                            Ativar
+                        </button>
+                    </div>
+                    <div id="codigoStatus" class="codigo-status hidden"></div>
+                </div>
+
                 <div id="limiteContainer" class="limite-container hidden">
                     <div class="limite-content">
                         <span class="limite-icon">⏱️</span>

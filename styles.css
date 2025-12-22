@@ -270,6 +270,80 @@ body {
     box-shadow: var(--shadow-md);
 }
 
+/* Código de Ativação */
+.codigo-ativacao-container {
+    margin-top: 20px;
+    padding: 15px 20px;
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    border: 2px solid #f59e0b;
+    border-radius: 12px;
+    box-shadow: var(--shadow-sm);
+}
+
+.codigo-input-wrapper {
+    display: flex;
+    gap: 10px;
+    align-items: stretch;
+}
+
+.codigo-input {
+    flex: 1;
+}
+
+.btn-ativar {
+    padding: 15px 25px;
+    font-size: 1rem;
+    font-weight: 600;
+    color: white;
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow-sm);
+    white-space: nowrap;
+}
+
+.btn-ativar:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+}
+
+.btn-ativar:active {
+    transform: translateY(0);
+}
+
+.btn-ativar.btn-desativar {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+}
+
+.btn-ativar.btn-desativar:hover {
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+}
+
+.codigo-input:disabled {
+    background: #f3f4f6;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.codigo-status {
+    margin-top: 10px;
+    padding: 10px 15px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.codigo-status.codigo-ativo {
+    background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+    color: #065f46;
+    border: 2px solid #10b981;
+}
+
 /* Limite de Gerações */
 .limite-container {
     margin-top: 20px;
@@ -1570,5 +1644,21 @@ body.theme-dark .grafico-frequencia-container {
 
 body.theme-dark .historico-jogo {
     background: #4a5568;
+}
+
+body.theme-dark .codigo-ativacao-container {
+    background: linear-gradient(135deg, #78350f 0%, #92400e 100%);
+    border-color: #f59e0b;
+}
+
+body.theme-dark .codigo-input:disabled {
+    background: #374151;
+    color: #9ca3af;
+}
+
+body.theme-dark .codigo-status.codigo-ativo {
+    background: linear-gradient(135deg, #064e3b 0%, #065f46 100%);
+    color: #a7f3d0;
+    border-color: #10b981;
 }
 

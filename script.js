@@ -22,6 +22,17 @@ const STORAGE_KEY_HISTORICO = 'lotoFacil_historico';
 const STORAGE_KEY_TEMA = 'lotoFacil_tema';
 const STORAGE_KEY_NUMEROS_EXCLUIR = 'lotoFacil_numeros_excluir';
 const STORAGE_KEY_NUMEROS_INCLUIR = 'lotoFacil_numeros_incluir';
+const STORAGE_KEY_CODIGO_ATIVO = 'lotoFacil_codigo_ativo';
+
+// Lista de códigos de ativação válidos (cada código pode ser diferente para cada usuário)
+// Você pode adicionar mais códigos aqui ou gerar códigos únicos dinamicamente
+const CODIGOS_VALIDOS = [
+    'ATIVO2024',
+    'LOTOFACIL2024',
+    'COUTI2024',
+    'DESBLOQUEIO2024',
+    'UNLIMITED2024'
+];
 
 // Estado global
 let numerosExcluir = new Set(JSON.parse(localStorage.getItem(STORAGE_KEY_NUMEROS_EXCLUIR) || '[]'));
@@ -603,10 +614,50 @@ function incrementarContador(quantidade = 1) {
 }
 
 /**
+ * Verifica se o código de ativação está ativo
+ */
+function isCodigoAtivo() {
+    return localStorage.getItem(STORAGE_KEY_CODIGO_ATIVO) === 'true';
+}
+
+/**
+ * Ativa um código de ativação
+ * @param {string} codigo - Código a ser validado
+ * @returns {boolean} - Retorna true se o código for válido
+ */
+function ativarCodigo(codigo) {
+    if (!codigo || codigo.trim() === '') {
+        return false;
+    }
+    
+    const codigoLimpo = codigo.trim().toUpperCase();
+    
+    // Verifica se o código está na lista de códigos válidos
+    if (CODIGOS_VALIDOS.includes(codigoLimpo)) {
+        localStorage.setItem(STORAGE_KEY_CODIGO_ATIVO, 'true');
+        return true;
+    }
+    
+    return false;
+}
+
+/**
+ * Desativa o código de ativação
+ */
+function desativarCodigo() {
+    localStorage.removeItem(STORAGE_KEY_CODIGO_ATIVO);
+}
+
+/**
  * Verifica se o usuário pode gerar a quantidade especificada de jogos
  * @param {number} quantidade - Quantidade de jogos a gerar (padrão: 1)
  */
 function podeGerar(quantidade = 1) {
+    // Se o código está ativo, permite gerar sem limite
+    if (isCodigoAtivo()) {
+        return true;
+    }
+    
     const dados = obterContadorGerações();
     return (dados.contador + quantidade) <= MAX_GERACOES_POR_DIA;
 }
@@ -634,6 +685,15 @@ function calcularTempoRestante() {
  */
 function atualizarExibicaoLimite() {
     if (!limiteContainer) return;
+
+    // Se o código está ativo, oculta o limite e libera tudo
+    if (isCodigoAtivo()) {
+        limiteContainer.classList.add('hidden');
+        btnGerar.disabled = false;
+        btnGerar.classList.remove('btn-bloqueado');
+        btnGerar.querySelector('.btn-text').textContent = 'Gerar Jogos';
+        return;
+    }
 
     const dados = obterContadorGerações();
     const restantes = MAX_GERACOES_POR_DIA - dados.contador;
@@ -672,6 +732,35 @@ function atualizarExibicaoLimite() {
         btnGerar.disabled = false;
         btnGerar.classList.remove('btn-bloqueado');
         btnGerar.querySelector('.btn-text').textContent = 'Gerar Jogos';
+    }
+}
+
+/**
+ * Atualiza a exibição do status do código de ativação
+ */
+function atualizarStatusCodigo() {
+    const codigoInput = document.getElementById('codigoAtivacao');
+    const codigoStatus = document.getElementById('codigoStatus');
+    const btnAtivar = document.getElementById('btnAtivar');
+    
+    if (!codigoInput || !codigoStatus || !btnAtivar) return;
+    
+    if (isCodigoAtivo()) {
+        codigoStatus.textContent = '✅ Código ativado - Jogos ilimitados!';
+        codigoStatus.className = 'codigo-status codigo-ativo';
+        codigoInput.disabled = true;
+        codigoInput.value = 'Código Ativo';
+        btnAtivar.textContent = 'Desativar';
+        btnAtivar.classList.add('btn-desativar');
+    } else {
+        codigoStatus.textContent = '';
+        codigoStatus.className = 'codigo-status hidden';
+        codigoInput.disabled = false;
+        if (codigoInput.value === 'Código Ativo') {
+            codigoInput.value = '';
+        }
+        btnAtivar.textContent = 'Ativar';
+        btnAtivar.classList.remove('btn-desativar');
     }
 }
 
@@ -751,8 +840,10 @@ form.addEventListener('submit', (e) => {
                     listaJogos.push(jogo);
                 }
                 
-                // Incrementa contador pela quantidade de jogos gerados
-                incrementarContador(quantidadeJogos);
+                // Incrementa contador pela quantidade de jogos gerados (apenas se código não estiver ativo)
+                if (!isCodigoAtivo()) {
+                    incrementarContador(quantidadeJogos);
+                }
                 
                 exibirJogos(listaJogos);
                 exibirEstatisticas(tresSorteios);
@@ -1084,6 +1175,7 @@ function exibirDashboard() {
 document.addEventListener('DOMContentLoaded', () => {
     // Inicializações básicas
     atualizarExibicaoLimite();
+    atualizarStatusCodigo();
     inicializarTema();
     inicializarSeletoresNumericos();
     inicializarFiltrosNumeros();
@@ -1182,6 +1274,43 @@ document.addEventListener('DOMContentLoaded', () => {
                 dashboardModal.setAttribute('aria-hidden', 'true');
             });
         }
+    }
+    
+    // Código de ativação
+    const btnAtivar = document.getElementById('btnAtivar');
+    const codigoInput = document.getElementById('codigoAtivacao');
+    if (btnAtivar && codigoInput) {
+        btnAtivar.addEventListener('click', () => {
+            if (isCodigoAtivo()) {
+                // Desativa o código
+                desativarCodigo();
+                atualizarStatusCodigo();
+                atualizarExibicaoLimite();
+                exibirErro('Código desativado. Limite de gerações restaurado.');
+            } else {
+                // Tenta ativar o código
+                const codigo = codigoInput.value;
+                if (ativarCodigo(codigo)) {
+                    atualizarStatusCodigo();
+                    atualizarExibicaoLimite();
+                    exibirErro('✅ Código ativado com sucesso! Jogos ilimitados disponíveis.');
+                    setTimeout(() => {
+                        errorMessage.classList.add('hidden');
+                    }, 3000);
+                } else {
+                    exibirErro('❌ Código inválido. Verifique e tente novamente.');
+                    codigoInput.value = '';
+                    codigoInput.focus();
+                }
+            }
+        });
+        
+        // Permite ativar com Enter
+        codigoInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !isCodigoAtivo()) {
+                btnAtivar.click();
+            }
+        });
     }
     
     // Limpar histórico

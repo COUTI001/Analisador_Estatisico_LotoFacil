@@ -161,37 +161,6 @@
                     <span class="btn-text">Gerar Jogos</span>
                     <span class="btn-icon">🎯</span>
                 </button>
-
-                <div class="form-group codigo-ativacao-container" id="codigoAtivacaoContainer">
-                    <label for="codigoAtivacao" class="label">
-                        <span class="label-number">🔓</span>
-                        Código de Ativação (opcional)
-                    </label>
-                    <div class="codigo-input-wrapper">
-                        <input 
-                            type="text" 
-                            id="codigoAtivacao" 
-                            class="input codigo-input"
-                            placeholder="Digite seu código de ativação para desbloquear jogos ilimitados"
-                            aria-label="Código de ativação"
-                        >
-                        <button type="button" class="btn-ativar" id="btnAtivar" title="Ativar código">
-                            Ativar
-                        </button>
-                    </div>
-                    <div id="codigoStatus" class="codigo-status hidden"></div>
-                </div>
-
-                <div id="limiteContainer" class="limite-container hidden">
-                    <div class="limite-content">
-                        <span class="limite-icon">⏱️</span>
-                        <div class="limite-text">
-                            <span class="limite-label">Gerações hoje: </span>
-                            <span class="limite-contador">0 de 3</span>
-                            <span class="limite-tempo"></span>
-                        </div>
-                    </div>
-                </div>
             </form>
 
             <div class="instrucoes-container">
@@ -201,7 +170,7 @@
                         <li>Preencha os <strong>3 últimos sorteios</strong> da Loto Fácil (15 números cada). Você pode digitar os números separados por vírgula ou usar os <strong>botões numéricos</strong> abaixo de cada campo para seleção visual.</li>
                         <li>Informe o <strong>resultado do jogo atual</strong> (último sorteio realizado) com 15 números.</li>
                         <li>Escolha o <strong>modo de geração</strong>: Balanceado (padrão), Conservador (prioriza frequência) ou Agressivo (prioriza números frios).</li>
-                        <li>Selecione a <strong>quantidade de jogos</strong> que deseja gerar (1, 2 ou 3).</li>
+                        <li>Selecione a <strong>quantidade de jogos</strong> que deseja gerar.</li>
                         <li><strong>Opcional:</strong> Use as <strong>Opções Avançadas</strong> para excluir ou incluir números específicos na geração.</li>
                         <li>Clique em <strong>"Gerar Jogos"</strong> para obter as sugestões. Use o botão <strong>"📋 Copiar"</strong> em cada jogo para copiar os números.</li>
                     </ol>
@@ -223,9 +192,6 @@
                         </ul>
                     </div>
                     
-                    <div class="instrucoes-limite">
-                        <p><strong>⚠️ Limite de Uso:</strong> Você pode gerar até <strong>3 jogos por dia</strong>. Após atingir o limite, o sistema será bloqueado e será liberado automaticamente após <strong>24 horas</strong> do primeiro uso do dia. O contador de gerações é exibido abaixo do botão "Gerar Jogos".</p>
-                    </div>
                 </div>
                 
                 <div class="aviso-container">
@@ -468,11 +434,6 @@
                     errorMessage.classList.remove('hidden');
                 }
                 
-                // Oculta código de ativação
-                var codigoContainer = document.getElementById('codigoAtivacaoContainer');
-                if (codigoContainer) {
-                    codigoContainer.style.display = 'none';
-                }
             }
             
             // Verifica e bloqueia imediatamente

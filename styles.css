@@ -270,141 +270,6 @@ body {
     box-shadow: var(--shadow-md);
 }
 
-/* Código de Ativação */
-.codigo-ativacao-container {
-    margin-top: 20px;
-    padding: 15px 20px;
-    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-    border: 2px solid #f59e0b;
-    border-radius: 12px;
-    box-shadow: var(--shadow-sm);
-}
-
-.codigo-input-wrapper {
-    display: flex;
-    gap: 10px;
-    align-items: stretch;
-}
-
-.codigo-input {
-    flex: 1;
-}
-
-.btn-ativar {
-    padding: 15px 25px;
-    font-size: 1rem;
-    font-weight: 600;
-    color: white;
-    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-    border: none;
-    border-radius: 12px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: var(--shadow-sm);
-    white-space: nowrap;
-}
-
-.btn-ativar:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
-    background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
-}
-
-.btn-ativar:active {
-    transform: translateY(0);
-}
-
-.btn-ativar.btn-desativar {
-    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-}
-
-.btn-ativar.btn-desativar:hover {
-    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
-}
-
-.codigo-input:disabled {
-    background: #f3f4f6;
-    cursor: not-allowed;
-    opacity: 0.7;
-}
-
-.codigo-status {
-    margin-top: 10px;
-    padding: 10px 15px;
-    border-radius: 8px;
-    font-size: 0.9rem;
-    font-weight: 600;
-    text-align: center;
-    transition: all 0.3s ease;
-}
-
-.codigo-status.codigo-ativo {
-    background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
-    color: #065f46;
-    border: 2px solid #10b981;
-}
-
-/* Limite de Gerações */
-.limite-container {
-    margin-top: 20px;
-    padding: 15px 20px;
-    border-radius: 12px;
-    box-shadow: var(--shadow-sm);
-    transition: all 0.3s ease;
-}
-
-.limite-container.limite-ativo {
-    background: linear-gradient(135deg, #e6fffa 0%, #b2f5ea 100%);
-    border: 2px solid #11998e;
-}
-
-.limite-container.limite-bloqueado {
-    background: linear-gradient(135deg, #fff5f5 0%, #fed7d7 100%);
-    border: 2px solid #fc8181;
-    animation: shake 0.5s ease-in-out;
-}
-
-.limite-content {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.limite-icon {
-    font-size: 1.5rem;
-}
-
-.limite-text {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    flex-wrap: wrap;
-    font-size: 0.95rem;
-    font-weight: 600;
-}
-
-.limite-label {
-    color: var(--text-primary);
-}
-
-.limite-contador {
-    color: #11998e;
-    font-weight: 700;
-}
-
-.limite-container.limite-bloqueado .limite-contador {
-    color: #c53030;
-}
-
-.limite-tempo {
-    color: #c53030;
-    font-weight: 700;
-    margin-left: 5px;
-}
-
-.limite-container.limite-ativo .limite-tempo {
-    display: none;
-}
 
 /* Instruções */
 .instrucoes-container {
@@ -543,23 +408,6 @@ body.theme-dark .funcionalidades-lista kbd {
     background: #4a5568;
 }
 
-.instrucoes-limite {
-    padding: 20px;
-    background: linear-gradient(135deg, #fff5f5 0%, #fed7d7 100%);
-    border-radius: 12px;
-    border-left: 4px solid #fc8181;
-    margin-top: 20px;
-}
-
-.instrucoes-limite p {
-    margin: 0;
-    color: var(--text-primary);
-    line-height: 1.6;
-}
-
-.instrucoes-limite strong {
-    color: #c53030;
-}
 
 /* Aviso */
 .aviso-container {
@@ -1491,20 +1339,6 @@ body.theme-dark .main-content {
         margin: 10px auto 0;
     }
 
-    /* Código de Ativação - Responsivo */
-    .codigo-input-wrapper {
-        flex-direction: column;
-        gap: 10px;
-    }
-
-    .btn-ativar {
-        width: 100%;
-        padding: 12px 20px;
-    }
-
-    .codigo-ativacao-container {
-        padding: 12px 15px;
-    }
 
     .logo {
         max-height: 60px;
@@ -1588,30 +1422,6 @@ body.theme-dark .main-content {
         grid-template-columns: repeat(5, 1fr);
     }
 
-    /* Código de Ativação - Mobile pequeno */
-    .codigo-ativacao-container {
-        padding: 10px 12px;
-        margin-top: 15px;
-    }
-
-    .codigo-input-wrapper {
-        gap: 8px;
-    }
-
-    .codigo-input {
-        font-size: 0.9rem;
-        padding: 12px 15px;
-    }
-
-    .btn-ativar {
-        padding: 12px 16px;
-        font-size: 0.9rem;
-    }
-
-    .codigo-status {
-        font-size: 0.85rem;
-        padding: 8px 12px;
-    }
 
     .numeros-seletor-grid {
         grid-template-columns: repeat(5, 1fr);
@@ -1686,19 +1496,4 @@ body.theme-dark .historico-jogo {
     background: #4a5568;
 }
 
-body.theme-dark .codigo-ativacao-container {
-    background: linear-gradient(135deg, #78350f 0%, #92400e 100%);
-    border-color: #f59e0b;
-}
-
-body.theme-dark .codigo-input:disabled {
-    background: #374151;
-    color: #9ca3af;
-}
-
-body.theme-dark .codigo-status.codigo-ativo {
-    background: linear-gradient(135deg, #064e3b 0%, #065f46 100%);
-    color: #a7f3d0;
-    border-color: #10b981;
-}
 

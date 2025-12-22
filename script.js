@@ -12,7 +12,6 @@ const errorMessage = document.getElementById('errorMessage');
 const estatisticasContainer = document.getElementById('estatisticasContainer');
 const maisSorteadosDiv = document.getElementById('maisSorteados');
 const menosSorteadosDiv = document.getElementById('menosSorteados');
-const limiteContainer = document.getElementById('limiteContainer');
 
 // BLOQUEIO IMEDIATO EM MODO ANÔNIMO - Executa antes de qualquer outra coisa
 (function() {
@@ -65,155 +64,12 @@ const limiteContainer = document.getElementById('limiteContainer');
     }
 })();
 
-// Constantes para controle de limite
-const MAX_GERACOES_POR_DIA = 3;
-const STORAGE_KEY_CONTADOR = 'lotoFacil_contador';
-const STORAGE_KEY_TIMESTAMP = 'lotoFacil_timestamp';
+// Constantes para armazenamento
 const STORAGE_KEY_HISTORICO = 'lotoFacil_historico';
 const STORAGE_KEY_TEMA = 'lotoFacil_tema';
 const STORAGE_KEY_NUMEROS_EXCLUIR = 'lotoFacil_numeros_excluir';
 const STORAGE_KEY_NUMEROS_INCLUIR = 'lotoFacil_numeros_incluir';
-const STORAGE_KEY_CODIGO_ATIVO = 'lotoFacil_codigo_ativo';
-const STORAGE_KEY_CODIGO_EXPIRACAO = 'lotoFacil_codigo_expiracao';
-const STORAGE_KEY_USER_ID = 'lotoFacil_user_id';
-const STORAGE_KEY_CODIGOS_PESSOAIS = 'lotoFacil_codigos_pessoais';
-const STORAGE_KEY_CODIGOS_TEMPORAIS_USADOS = 'lotoFacil_codigos_temporais_usados';
 
-// Valor especial para códigos ilimitados
-const CODIGO_ILIMITADO = -1;
-
-// Lista de códigos de ativação válidos com seus períodos de validade
-// Períodos: 15 dias, 30 dias, 6 meses (180 dias), 1 ano (365 dias), ilimitado (-1)
-const CODIGOS_VALIDOS = {
-    // Códigos de 15 dias
-    'ATIVO15D': 15,
-    'LOTO15D': 15,
-    'PREMIUM15D': 15,
-    
-    // Códigos de 30 dias
-    'ATIVO30D': 30,
-    'LOTO30D': 30,
-    'PREMIUM30D': 30,
-    'COUTI30D': 30,
-    
-    // Códigos de 6 meses (180 dias)
-    'ATIVO6M': 180,
-    'LOTO6M': 180,
-    'PREMIUM6M': 180,
-    'COUTI6M': 180,
-    'UNLIMITED6M': 180,
-    
-    // Códigos de 1 ano (365 dias)
-    'ATIVO1A': 365,
-    'LOTO1A': 365,
-    'PREMIUM1A': 365,
-    'COUTI1A': 365,
-    'UNLIMITED1A': 365,
-    'VIP2024': 365,
-    
-    // Códigos pessoais ilimitados (únicos por usuário)
-    'P&RSONAL001': CODIGO_ILIMITADO,
-    'PERSON@L002': CODIGO_ILIMITADO,
-    'PROFILE003': CODIGO_ILIMITADO,
-    '$Atenccao004': CODIGO_ILIMITADO,
-    '*#COABITACAO005': CODIGO_ILIMITADO
-};
-
-/**
- * Gera ou recupera o ID único do usuário
- */
-function getUserId() {
-    let userId = localStorage.getItem(STORAGE_KEY_USER_ID);
-    
-    if (!userId) {
-        // Gera um ID único baseado em timestamp + random + user agent
-        const timestamp = Date.now();
-        const random = Math.random().toString(36).substring(2, 15);
-        const userAgent = navigator.userAgent.substring(0, 10);
-        userId = btoa(`${timestamp}-${random}-${userAgent}`).substring(0, 32);
-        localStorage.setItem(STORAGE_KEY_USER_ID, userId);
-    }
-    
-    return userId;
-}
-
-/**
- * Obtém o registro de códigos pessoais ativados
- */
-function getCodigosPessoais() {
-    const codigosStr = localStorage.getItem(STORAGE_KEY_CODIGOS_PESSOAIS);
-    return codigosStr ? JSON.parse(codigosStr) : {};
-}
-
-/**
- * Salva o registro de códigos ativados (aplica-se a TODOS os códigos)
- */
-function setCodigosPessoais(codigos) {
-    localStorage.setItem(STORAGE_KEY_CODIGOS_PESSOAIS, JSON.stringify(codigos));
-}
-
-/**
- * Verifica se um código já foi usado por outro usuário
- * (aplica-se a TODOS os códigos: temporais e pessoais)
- */
-function codigoJaUsadoPorOutroUsuario(codigo) {
-    const codigos = getCodigosPessoais();
-    const userId = getUserId();
-    
-    // Se o código existe e foi usado por outro usuário
-    if (codigos[codigo] && codigos[codigo] !== userId) {
-        return true;
-    }
-    
-    return false;
-}
-
-/**
- * Registra o uso de um código para o usuário atual
- * (aplica-se a TODOS os códigos: temporais e pessoais)
- */
-function registrarCodigo(codigo) {
-    const codigos = getCodigosPessoais();
-    const userId = getUserId();
-    codigos[codigo] = userId;
-    setCodigosPessoais(codigos);
-}
-
-// Funções mantidas para compatibilidade (deprecated - usar as novas acima)
-function codigoPessoalJaUsado(codigo) {
-    return codigoJaUsadoPorOutroUsuario(codigo);
-}
-
-function registrarCodigoPessoal(codigo) {
-    registrarCodigo(codigo);
-}
-
-/**
- * Obtém a lista de códigos temporais já utilizados pelo usuário atual
- */
-function getCodigosTemporaisUsados() {
-    const codigosStr = localStorage.getItem(STORAGE_KEY_CODIGOS_TEMPORAIS_USADOS);
-    return codigosStr ? JSON.parse(codigosStr) : [];
-}
-
-/**
- * Registra um código temporal como usado pelo usuário atual
- */
-function registrarCodigoTemporalUsado(codigo) {
-    const codigos = getCodigosTemporaisUsados();
-    if (!codigos.includes(codigo)) {
-        codigos.push(codigo);
-        localStorage.setItem(STORAGE_KEY_CODIGOS_TEMPORAIS_USADOS, JSON.stringify(codigos));
-    }
-}
-
-/**
- * Verifica se um código temporal já foi usado pelo usuário atual
- */
-function codigoTemporalJaUsado(codigo) {
-    const codigos = getCodigosTemporaisUsados();
-    return codigos.includes(codigo);
-}
 
 // Estado global
 let numerosExcluir = new Set(JSON.parse(localStorage.getItem(STORAGE_KEY_NUMEROS_EXCLUIR) || '[]'));
@@ -740,16 +596,6 @@ function exibirEstatisticas(tresSorteios) {
 
 
 /**
- * Verifica se já passou 24 horas desde a primeira geração
- */
-function passou24Horas(timestamp) {
-    const agora = Date.now();
-    const diferenca = agora - timestamp;
-    const vinteQuatroHoras = 24 * 60 * 60 * 1000; // 24 horas em milissegundos
-    return diferenca >= vinteQuatroHoras;
-}
-
-/**
  * Verifica se está em modo anônimo/privado
  * Retorna true se estiver em modo anônimo
  * Usa múltiplas técnicas para garantir detecção confiável
@@ -845,337 +691,6 @@ function isModoAnonimo() {
     }
 }
 
-/**
- * Obtém o contador de gerações do dia
- */
-function obterContadorGerações() {
-    const timestamp = localStorage.getItem(STORAGE_KEY_TIMESTAMP);
-    const contador = localStorage.getItem(STORAGE_KEY_CONTADOR);
-
-    // Se não existe timestamp ou passou 24 horas, reseta
-    if (!timestamp || passou24Horas(parseInt(timestamp, 10))) {
-        return { contador: 0, timestamp: null };
-    }
-
-    return {
-        contador: parseInt(contador || '0', 10),
-        timestamp: parseInt(timestamp, 10)
-    };
-}
-
-/**
- * Incrementa o contador de gerações pela quantidade especificada
- * @param {number} quantidade - Quantidade de jogos gerados (padrão: 1)
- */
-function incrementarContador(quantidade = 1) {
-    const agora = Date.now();
-    const dados = obterContadorGerações();
-
-    let novoContador;
-    let novoTimestamp;
-
-    if (dados.timestamp === null || passou24Horas(dados.timestamp)) {
-        // Primeira geração do dia ou passou 24 horas
-        novoContador = quantidade;
-        novoTimestamp = agora;
-    } else {
-        // Incrementa contador existente pela quantidade
-        novoContador = dados.contador + quantidade;
-        novoTimestamp = dados.timestamp;
-    }
-
-    localStorage.setItem(STORAGE_KEY_CONTADOR, novoContador.toString());
-    localStorage.setItem(STORAGE_KEY_TIMESTAMP, novoTimestamp.toString());
-
-    return { contador: novoContador, timestamp: novoTimestamp };
-}
-
-/**
- * Verifica se o código de ativação está ativo e não expirado
- */
-function isCodigoAtivo() {
-    const expiracaoStr = localStorage.getItem(STORAGE_KEY_CODIGO_EXPIRACAO);
-    
-    // Se não há expiração salva, verifica se é código ilimitado
-    if (!expiracaoStr) {
-        const codigoAtivo = localStorage.getItem(STORAGE_KEY_CODIGO_ATIVO);
-        if (codigoAtivo) {
-            // Se for código pessoal ilimitado, verifica se ainda pertence ao usuário
-            const codigos = getCodigosPessoais();
-            const userId = getUserId();
-            if (codigos[codigoAtivo] === userId) {
-                return true; // Código ilimitado ativo para este usuário
-            }
-        }
-        return false;
-    }
-    
-    const expiracao = parseInt(expiracaoStr, 10);
-    
-    // Se for código ilimitado (-1), sempre retorna true se está ativo
-    if (expiracao === CODIGO_ILIMITADO) {
-        const codigoAtivo = localStorage.getItem(STORAGE_KEY_CODIGO_ATIVO);
-        if (codigoAtivo) {
-            // Verifica se ainda pertence ao usuário atual
-            const codigos = getCodigosPessoais();
-            const userId = getUserId();
-            if (codigos[codigoAtivo] === userId) {
-                return true;
-            }
-        }
-        return false;
-    }
-    
-    const agora = Date.now();
-    
-    // Se passou da data de expiração, remove (o código já está registrado para este usuário)
-    // Não permite reativação pois o código já está vinculado a este usuário
-    if (agora > expiracao) {
-        localStorage.removeItem(STORAGE_KEY_CODIGO_ATIVO);
-        localStorage.removeItem(STORAGE_KEY_CODIGO_EXPIRACAO);
-        return false;
-    }
-    
-    return true;
-}
-
-/**
- * Retorna a data de expiração formatada do código ativo
- */
-function getCodigoExpiracaoFormatada() {
-    const expiracaoStr = localStorage.getItem(STORAGE_KEY_CODIGO_EXPIRACAO);
-    if (!expiracaoStr) {
-        return null;
-    }
-    
-    const expiracao = parseInt(expiracaoStr, 10);
-    
-    // Se for código ilimitado, retorna null (sem expiração)
-    if (expiracao === CODIGO_ILIMITADO) {
-        return null;
-    }
-    
-    const data = new Date(expiracao);
-    return data.toLocaleDateString('pt-BR', { 
-        day: '2-digit', 
-        month: '2-digit', 
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-    });
-}
-
-/**
- * Calcula os dias restantes até a expiração
- */
-function getDiasRestantes() {
-    const expiracaoStr = localStorage.getItem(STORAGE_KEY_CODIGO_EXPIRACAO);
-    if (!expiracaoStr) {
-        return 0;
-    }
-    
-    const expiracao = parseInt(expiracaoStr, 10);
-    
-    // Se for código ilimitado, retorna -1 para indicar ilimitado
-    if (expiracao === CODIGO_ILIMITADO) {
-        return -1;
-    }
-    
-    const agora = Date.now();
-    const diferenca = expiracao - agora;
-    
-    if (diferenca <= 0) {
-        return 0;
-    }
-    
-    return Math.ceil(diferenca / (1000 * 60 * 60 * 24)); // Converte para dias
-}
-
-/**
- * Ativa um código de ativação
- * @param {string} codigo - Código a ser validado
- * @returns {object} - Retorna { sucesso: boolean, dias: number, motivo?: string } ou { sucesso: false, motivo?: string }
- */
-function ativarCodigo(codigo) {
-    if (!codigo || codigo.trim() === '') {
-        return { sucesso: false, motivo: 'Código vazio' };
-    }
-    
-    const codigoLimpo = codigo.trim().toUpperCase();
-    
-    // Verifica se o código está na lista de códigos válidos
-    const diasValidade = CODIGOS_VALIDOS[codigoLimpo];
-    
-    if (diasValidade !== undefined) {
-        // Se for código pessoal ilimitado
-        if (diasValidade === CODIGO_ILIMITADO) {
-            // Verifica se já foi usado por outro usuário
-            if (codigoJaUsadoPorOutroUsuario(codigoLimpo)) {
-                return { sucesso: false, motivo: 'Este código já foi utilizado por outro usuário. Cada código só pode ser usado por um usuário.' };
-            }
-            
-            // Registra o código para o usuário atual
-            registrarCodigo(codigoLimpo);
-            
-            // Salva como código ativo (ilimitado)
-            localStorage.setItem(STORAGE_KEY_CODIGO_ATIVO, codigoLimpo);
-            localStorage.setItem(STORAGE_KEY_CODIGO_EXPIRACAO, CODIGO_ILIMITADO.toString());
-            
-            return { sucesso: true, dias: CODIGO_ILIMITADO, ilimitado: true };
-        }
-        
-        // Código com validade temporal
-        // Verifica se já foi usado por outro usuário (todos os códigos são únicos por usuário)
-        if (codigoJaUsadoPorOutroUsuario(codigoLimpo)) {
-            return { sucesso: false, motivo: 'Este código já foi utilizado por outro usuário. Cada código só pode ser usado por um usuário.' };
-        }
-        
-        const agora = Date.now();
-        const expiracao = agora + (diasValidade * 24 * 60 * 60 * 1000); // Adiciona os dias em milissegundos
-        
-        // Registra o código para o usuário atual ANTES de ativar
-        registrarCodigo(codigoLimpo);
-        
-        localStorage.setItem(STORAGE_KEY_CODIGO_ATIVO, codigoLimpo);
-        localStorage.setItem(STORAGE_KEY_CODIGO_EXPIRACAO, expiracao.toString());
-        
-        return { sucesso: true, dias: diasValidade, ilimitado: false };
-    }
-    
-    return { sucesso: false, motivo: 'Código inválido' };
-}
-
-/**
- * Verifica se o usuário pode gerar a quantidade especificada de jogos
- * @param {number} quantidade - Quantidade de jogos a gerar (padrão: 1)
- */
-function podeGerar(quantidade = 1) {
-    // Se o código está ativo, permite gerar sem limite
-    if (isCodigoAtivo()) {
-        return true;
-    }
-    
-    const dados = obterContadorGerações();
-    return (dados.contador + quantidade) <= MAX_GERACOES_POR_DIA;
-}
-
-/**
- * Calcula o tempo restante até liberar novamente (em horas e minutos)
- */
-function calcularTempoRestante() {
-    const dados = obterContadorGerações();
-    
-    if (dados.timestamp === null || passou24Horas(dados.timestamp)) {
-        return null; // Já pode usar
-    }
-
-    const agora = Date.now();
-    const diferenca = dados.timestamp - agora + (24 * 60 * 60 * 1000); // Tempo restante
-    const horas = Math.floor(diferenca / (1000 * 60 * 60));
-    const minutos = Math.floor((diferenca % (1000 * 60 * 60)) / (1000 * 60));
-
-    return { horas, minutos };
-}
-
-/**
- * Atualiza a exibição do limite de gerações
- */
-function atualizarExibicaoLimite() {
-    if (!limiteContainer) return;
-
-    // Se o código está ativo, oculta o limite e libera tudo
-    if (isCodigoAtivo()) {
-        limiteContainer.classList.add('hidden');
-        btnGerar.disabled = false;
-        btnGerar.classList.remove('btn-bloqueado');
-        btnGerar.querySelector('.btn-text').textContent = 'Gerar Jogos';
-        return;
-    }
-
-    const dados = obterContadorGerações();
-    const restantes = MAX_GERACOES_POR_DIA - dados.contador;
-
-    if (dados.contador === 0) {
-        limiteContainer.classList.add('hidden');
-        return;
-    }
-
-    limiteContainer.classList.remove('hidden');
-    const contadorSpan = limiteContainer.querySelector('.limite-contador');
-    const tempoSpan = limiteContainer.querySelector('.limite-tempo');
-
-    if (contadorSpan) {
-        contadorSpan.textContent = `${dados.contador} de ${MAX_GERACOES_POR_DIA}`;
-    }
-
-    if (restantes === 0) {
-        // Bloqueado
-        limiteContainer.className = 'limite-container limite-bloqueado';
-        const tempoRestante = calcularTempoRestante();
-        if (tempoRestante && tempoSpan) {
-            tempoSpan.textContent = `Libera em: ${tempoRestante.horas}h ${tempoRestante.minutos}min`;
-        }
-        // Atualiza o botão - bloqueado
-        btnGerar.disabled = true;
-        btnGerar.classList.add('btn-bloqueado');
-        btnGerar.querySelector('.btn-text').textContent = 'Limite Atingido';
-    } else {
-        // Ainda pode usar
-        limiteContainer.className = 'limite-container limite-ativo';
-        if (tempoSpan) {
-            tempoSpan.textContent = '';
-        }
-        // Atualiza o botão - liberado
-        btnGerar.disabled = false;
-        btnGerar.classList.remove('btn-bloqueado');
-        btnGerar.querySelector('.btn-text').textContent = 'Gerar Jogos';
-    }
-}
-
-/**
- * Atualiza a exibição do status do código de ativação
- */
-function atualizarStatusCodigo() {
-    const codigoInput = document.getElementById('codigoAtivacao');
-    const codigoStatus = document.getElementById('codigoStatus');
-    const btnAtivar = document.getElementById('btnAtivar');
-    const codigoContainer = document.getElementById('codigoAtivacaoContainer');
-    
-    if (!codigoInput || !codigoStatus || !btnAtivar || !codigoContainer) return;
-    
-    if (isCodigoAtivo()) {
-        const diasRestantes = getDiasRestantes();
-        const expiracaoFormatada = getCodigoExpiracaoFormatada();
-        
-        // Se for código ilimitado
-        if (diasRestantes === -1) {
-            codigoStatus.textContent = `✅ Código pessoal ativo - Jogos ilimitados permanentemente!`;
-        } else if (diasRestantes > 0 && expiracaoFormatada) {
-            codigoStatus.textContent = `✅ Código ativo - Jogos ilimitados! Expira em ${diasRestantes} dia(s) (${expiracaoFormatada})`;
-        } else if (expiracaoFormatada) {
-            codigoStatus.textContent = `✅ Código ativo - Jogos ilimitados! Expira em ${expiracaoFormatada}`;
-        } else {
-            codigoStatus.textContent = `✅ Código ativo - Jogos ilimitados!`;
-        }
-        
-        codigoStatus.className = 'codigo-status codigo-ativo';
-        codigoInput.disabled = true;
-        codigoInput.value = 'Código Ativo';
-        codigoInput.style.display = 'none';
-        btnAtivar.style.display = 'none';
-    } else {
-        codigoStatus.textContent = '';
-        codigoStatus.className = 'codigo-status hidden';
-        codigoInput.disabled = false;
-        codigoInput.style.display = 'block';
-        btnAtivar.style.display = 'block';
-        if (codigoInput.value === 'Código Ativo') {
-            codigoInput.value = '';
-        }
-        btnAtivar.textContent = 'Ativar';
-        btnAtivar.classList.remove('btn-desativar');
-    }
-}
 
 /**
  * Exibe mensagem de erro
@@ -1212,29 +727,11 @@ form.addEventListener('submit', (e) => {
         return false;
     }
     
-    // Obtém a quantidade de jogos a gerar ANTES de verificar o limite
+    // Obtém a quantidade de jogos a gerar
     const quantidadeJogos = parseInt(
         document.getElementById('quantidadeJogos').value,
         10
     );
-    
-    // Verifica se pode gerar a quantidade solicitada
-    if (!podeGerar(quantidadeJogos)) {
-        const dados = obterContadorGerações();
-        const disponivel = MAX_GERACOES_POR_DIA - dados.contador;
-        const tempoRestante = calcularTempoRestante();
-        
-        if (dados.contador >= MAX_GERACOES_POR_DIA) {
-            if (tempoRestante) {
-                exibirErro(`Limite diário atingido! Você já gerou ${MAX_GERACOES_POR_DIA} jogos hoje. Tente novamente em ${tempoRestante.horas}h ${tempoRestante.minutos}min.`);
-            } else {
-                exibirErro(`Limite diário atingido! Você já gerou ${MAX_GERACOES_POR_DIA} jogos hoje.`);
-            }
-        } else {
-            exibirErro(`Você só pode gerar mais ${disponivel} jogo(s) hoje. Tente gerar ${disponivel} jogo(s) ou aguarde 24 horas.`);
-        }
-        return;
-    }
     
     // Oculta mensagens anteriores
     errorMessage.classList.add('hidden');
@@ -1269,40 +766,22 @@ form.addEventListener('submit', (e) => {
                     listaJogos.push(jogo);
                 }
                 
-                // Incrementa contador pela quantidade de jogos gerados (apenas se código não estiver ativo)
-                if (!isCodigoAtivo()) {
-                    incrementarContador(quantidadeJogos);
-                }
-                
                 exibirJogos(listaJogos);
                 exibirEstatisticas(tresSorteios);
-                
-                // Atualiza exibição do limite após incrementar (isso já desabilita o botão se necessário)
-                atualizarExibicaoLimite();
             } catch (error) {
                 exibirErro(error.message);
-                // Se deu erro, verifica se ainda pode gerar para reabilitar o botão
-                if (podeGerar()) {
-                    btnGerar.disabled = false;
-                    btnGerar.querySelector('.btn-text').textContent = 'Gerar Jogos';
-                    btnGerar.classList.remove('btn-bloqueado');
-                } else {
-                    // Se atingiu o limite, atualiza a exibição corretamente
-                    atualizarExibicaoLimite();
-                }
+                // Reabilita o botão em caso de erro
+                btnGerar.disabled = false;
+                btnGerar.querySelector('.btn-text').textContent = 'Gerar Jogos';
+                btnGerar.classList.remove('btn-bloqueado');
             }
         }, 300);
     } catch (error) {
         exibirErro(error.message);
-        // Se deu erro, verifica se ainda pode gerar para reabilitar o botão
-        if (podeGerar()) {
-            btnGerar.disabled = false;
-            btnGerar.querySelector('.btn-text').textContent = 'Gerar Jogos';
-            btnGerar.classList.remove('btn-bloqueado');
-        } else {
-            // Se atingiu o limite, atualiza a exibição corretamente
-            atualizarExibicaoLimite();
-        }
+        // Reabilita o botão em caso de erro
+        btnGerar.disabled = false;
+        btnGerar.querySelector('.btn-text').textContent = 'Gerar Jogos';
+        btnGerar.classList.remove('btn-bloqueado');
     }
 });
 
@@ -1561,30 +1040,15 @@ async function exportarImagem() {
  * Exibe dashboard de uso
  */
 function exibirDashboard() {
-    const dados = obterContadorGerações();
     const historico = JSON.parse(localStorage.getItem(STORAGE_KEY_HISTORICO) || '[]');
-    const tempoRestante = calcularTempoRestante();
     
     const container = document.getElementById('dashboardContent');
     if (!container) return;
     
     const totalJogosGerados = historico.reduce((sum, item) => sum + item.jogos.length, 0);
-    const restantes = MAX_GERACOES_POR_DIA - dados.contador;
     
     container.innerHTML = `
         <div class="dashboard-grid">
-            <div class="dashboard-card">
-                <h3>📊 Uso Hoje</h3>
-                <div class="dashboard-value">${dados.contador} / ${MAX_GERACOES_POR_DIA}</div>
-                <div class="dashboard-progress">
-                    <div class="dashboard-progress-bar" style="width: ${(dados.contador / MAX_GERACOES_POR_DIA) * 100}%"></div>
-                </div>
-                ${restantes === 0 && tempoRestante ? 
-                    `<p class="dashboard-info">⏱️ Libera em: ${tempoRestante.horas}h ${tempoRestante.minutos}min</p>` :
-                    `<p class="dashboard-info">✅ ${restantes} gerações restantes hoje</p>`
-                }
-            </div>
-            
             <div class="dashboard-card">
                 <h3>📋 Total de Jogos</h3>
                 <div class="dashboard-value">${totalJogosGerados}</div>
@@ -1681,8 +1145,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     // Inicializações básicas
-    atualizarExibicaoLimite();
-    atualizarStatusCodigo();
     inicializarTema();
     inicializarSeletoresNumericos();
     inicializarFiltrosNumeros();
@@ -1783,59 +1245,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
-    // Código de ativação
-    const btnAtivar = document.getElementById('btnAtivar');
-    const codigoInput = document.getElementById('codigoAtivacao');
-    if (btnAtivar && codigoInput) {
-        btnAtivar.addEventListener('click', () => {
-            // Tenta ativar o código
-            const codigo = codigoInput.value;
-            const resultado = ativarCodigo(codigo);
-            
-            if (resultado.sucesso) {
-                atualizarStatusCodigo();
-                atualizarExibicaoLimite();
-                
-                let mensagem = '';
-                if (resultado.ilimitado) {
-                    mensagem = `✅ Código pessoal ativado com sucesso! Jogos ilimitados permanentemente. Este código agora está vinculado ao seu usuário.`;
-                } else if (resultado.dias === 15) {
-                    mensagem = `✅ Código ativado com sucesso! Jogos ilimitados por 15 dias.`;
-                } else if (resultado.dias === 30) {
-                    mensagem = `✅ Código ativado com sucesso! Jogos ilimitados por 30 dias.`;
-                } else if (resultado.dias === 180) {
-                    mensagem = `✅ Código ativado com sucesso! Jogos ilimitados por 6 meses.`;
-                } else if (resultado.dias === 365) {
-                    mensagem = `✅ Código ativado com sucesso! Jogos ilimitados por 1 ano.`;
-                } else {
-                    mensagem = `✅ Código ativado com sucesso! Jogos ilimitados por ${resultado.dias} dia(s).`;
-                }
-                
-                exibirErro(mensagem);
-                setTimeout(() => {
-                    errorMessage.classList.add('hidden');
-                }, 5000);
-                
-                codigoInput.value = '';
-            } else {
-                let mensagemErro = '❌ Código inválido. Verifique e tente novamente.';
-                if (resultado.motivo && resultado.motivo.includes('outro usuário')) {
-                    mensagemErro = `❌ ${resultado.motivo}`;
-                }
-                exibirErro(mensagemErro);
-                codigoInput.value = '';
-                codigoInput.focus();
-            }
-        });
-        
-        // Permite ativar com Enter
-        codigoInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter' && !isCodigoAtivo()) {
-                btnAtivar.click();
-            }
-        });
-    }
-    
     // Limpar histórico
     const btnLimparHistorico = document.getElementById('limparHistorico');
     if (btnLimparHistorico) {
@@ -1851,7 +1260,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnLimparDados = document.getElementById('btnLimparDados');
     if (btnLimparDados) {
         btnLimparDados.addEventListener('click', () => {
-            if (confirm('Tem certeza que deseja limpar todos os campos preenchidos? O contador de gerações será mantido.')) {
+            if (confirm('Tem certeza que deseja limpar todos os campos preenchidos?')) {
                 // Limpa apenas os campos do formulário
                 ['sorteio1', 'sorteio2', 'sorteio3', 'resultadoAtual'].forEach(campoId => {
                     const input = document.getElementById(campoId);
@@ -1873,11 +1282,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 estatisticasContainer.classList.add('hidden');
                 errorMessage.classList.add('hidden');
                 
-                // IMPORTANTE: NÃO limpa STORAGE_KEY_CONTADOR e STORAGE_KEY_TIMESTAMP
-                // para manter o controle de gerações e bloqueio funcionando
-                
-                // Atualiza a exibição do limite (para garantir que está correta)
-                atualizarExibicaoLimite();
             }
         });
     }
@@ -1887,7 +1291,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Enter para gerar (se não estiver em textarea)
         if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA' && !e.target.closest('.modal')) {
             e.preventDefault();
-            if (podeGerar() && !btnGerar.disabled) {
+            if (!btnGerar.disabled) {
                 form.dispatchEvent(new Event('submit'));
             }
         }
@@ -1902,10 +1306,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
     
-    // Atualiza o tempo restante a cada minuto se estiver bloqueado
-    setInterval(() => {
-        atualizarExibicaoLimite();
-    }, 60000); // Atualiza a cada 1 minuto
 });
 
 // Adiciona validação visual em tempo real nos inputs (mantido para compatibilidade, mas atualizarContador já faz isso)

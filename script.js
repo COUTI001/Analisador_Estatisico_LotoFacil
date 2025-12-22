@@ -14,6 +14,57 @@ const maisSorteadosDiv = document.getElementById('maisSorteados');
 const menosSorteadosDiv = document.getElementById('menosSorteados');
 const limiteContainer = document.getElementById('limiteContainer');
 
+// BLOQUEIO IMEDIATO EM MODO ANÔNIMO - Executa antes de qualquer outra coisa
+(function() {
+    'use strict';
+    
+    function verificarModoAnonimoRapido() {
+        try {
+            var testKey = '__rapid_check__' + Date.now();
+            var testVal = 'rapid_' + Math.random();
+            localStorage.setItem(testKey, testVal);
+            var retrieved = localStorage.getItem(testKey);
+            localStorage.removeItem(testKey);
+            return retrieved !== testVal;
+        } catch (e) {
+            return true;
+        }
+    }
+    
+    if (verificarModoAnonimoRapido()) {
+        // Bloqueia o botão imediatamente se existir
+        if (btnGerar) {
+            Object.defineProperty(btnGerar, 'disabled', {
+                get: function() { return true; },
+                set: function() { return; },
+                configurable: false
+            });
+            btnGerar.setAttribute('disabled', 'disabled');
+            btnGerar.classList.add('btn-bloqueado');
+            btnGerar.style.pointerEvents = 'none';
+            btnGerar.style.opacity = '0.6';
+            btnGerar.style.cursor = 'not-allowed';
+            
+            var btnText = btnGerar.querySelector('.btn-text');
+            if (btnText) {
+                btnText.textContent = 'Janela Anônima Não Suportada';
+            }
+        }
+        
+        // Bloqueia o formulário
+        if (form) {
+            var originalSubmit = form.submit;
+            form.submit = function() { return false; };
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                e.stopImmediatePropagation();
+                return false;
+            }, true);
+        }
+    }
+})();
+
 // Constantes para controle de limite
 const MAX_GERACOES_POR_DIA = 3;
 const STORAGE_KEY_CONTADOR = 'lotoFacil_contador';
@@ -699,6 +750,102 @@ function passou24Horas(timestamp) {
 }
 
 /**
+ * Verifica se está em modo anônimo/privado
+ * Retorna true se estiver em modo anônimo
+ * Usa múltiplas técnicas para garantir detecção confiável
+ */
+function isModoAnonimo() {
+    try {
+        // Técnica 1: Tentar escrever e ler do localStorage
+        const testKey1 = '__anonimo_test1__' + Date.now();
+        const testValue1 = 'test_value_' + Math.random();
+        
+        localStorage.setItem(testKey1, testValue1);
+        const retrieved1 = localStorage.getItem(testKey1);
+        localStorage.removeItem(testKey1);
+        
+        // Se não conseguiu ler o que escreveu, está em modo anônimo
+        if (retrieved1 !== testValue1) {
+            return true;
+        }
+        
+        // Técnica 2: Verificar se consegue persistir e recuperar dados
+        // Em alguns navegadores, localStorage existe mas não persiste em modo anônimo
+        const persistenceKey = '__persist_test__';
+        const persistenceValue = 'persist_' + Date.now();
+        
+        localStorage.setItem(persistenceKey, persistenceValue);
+        const persistedValue = localStorage.getItem(persistenceKey);
+        localStorage.removeItem(persistenceKey);
+        
+        if (persistedValue !== persistenceValue) {
+            return true;
+        }
+        
+        // Técnica 3: Verificar sessionStorage também
+        try {
+            const testKey3 = '__anonimo_test3__' + Date.now();
+            const testValue3 = 'session_' + Math.random();
+            sessionStorage.setItem(testKey3, testValue3);
+            const sessionRetrieved = sessionStorage.getItem(testKey3);
+            sessionStorage.removeItem(testKey3);
+            
+            if (sessionRetrieved !== testValue3) {
+                return true;
+            }
+        } catch (e) {
+            return true; // SessionStorage bloqueado indica modo anônimo
+        }
+        
+        // Técnica 4: Verificar se consegue escrever e ler valores maiores
+        // Alguns navegadores em modo anônimo têm limitações de tamanho
+        try {
+            const largeKey = '__large_test__';
+            const largeValue = 'x'.repeat(1000) + Date.now();
+            localStorage.setItem(largeKey, largeValue);
+            const largeRetrieved = localStorage.getItem(largeKey);
+            localStorage.removeItem(largeKey);
+            
+            if (largeRetrieved !== largeValue) {
+                return true;
+            }
+        } catch (e) {
+            return true;
+        }
+        
+        // Técnica 5: Verificar múltiplas operações sequenciais
+        // Em modo anônimo, operações podem falhar intermitentemente
+        let failures = 0;
+        for (let i = 0; i < 3; i++) {
+            try {
+                const seqKey = '__seq_test__' + i + '_' + Date.now();
+                const seqValue = 'seq_' + i + '_' + Math.random();
+                localStorage.setItem(seqKey, seqValue);
+                const seqRetrieved = localStorage.getItem(seqKey);
+                localStorage.removeItem(seqKey);
+                
+                if (seqRetrieved !== seqValue) {
+                    failures++;
+                }
+            } catch (e) {
+                failures++;
+            }
+        }
+        
+        // Se mais de uma operação falhou, assume modo anônimo
+        if (failures > 1) {
+            return true;
+        }
+        
+        return false;
+    } catch (e) {
+        // Se qualquer erro ocorrer ao acessar localStorage, assume modo anônimo
+        // Isso é mais seguro do que permitir uso
+        return true;
+    }
+}
+
+/**
  * Obtém o contador de gerações do dia
  */
 function obterContadorGerações() {
@@ -1048,6 +1195,22 @@ function exibirErro(mensagem) {
  */
 form.addEventListener('submit', (e) => {
     e.preventDefault();
+    e.stopPropagation();
+    e.stopImmediatePropagation();
+    
+    // Verifica se está em modo anônimo - bloqueia imediatamente
+    if (isModoAnonimo()) {
+        bloquearBotaoAnonimo();
+        exibirErro('⚠️ Este aplicativo não funciona em janela anônima/privada. Por favor, use uma janela normal do navegador para utilizar o aplicativo.');
+        
+        // Bloqueia o formulário completamente
+        const inputs = document.querySelectorAll('#sorteioForm input, #sorteioForm select, #sorteioForm button');
+        inputs.forEach(input => {
+            input.disabled = true;
+        });
+        
+        return false;
+    }
     
     // Obtém a quantidade de jogos a gerar ANTES de verificar o limite
     const quantidadeJogos = parseInt(
@@ -1437,8 +1600,86 @@ function exibirDashboard() {
     `;
 }
 
+// Função para bloquear botão de forma permanente em modo anônimo
+function bloquearBotaoAnonimo() {
+    if (!btnGerar) return;
+    
+    // Força o botão a ficar desabilitado
+    btnGerar.disabled = true;
+    btnGerar.setAttribute('disabled', 'disabled');
+    btnGerar.classList.add('btn-bloqueado');
+    btnGerar.style.pointerEvents = 'none';
+    btnGerar.style.opacity = '0.6';
+    btnGerar.style.cursor = 'not-allowed';
+    
+    const btnText = btnGerar.querySelector('.btn-text');
+    if (btnText) {
+        btnText.textContent = 'Janela Anônima Não Suportada';
+    }
+    
+    // Intercepta tentativas de habilitar
+    Object.defineProperty(btnGerar, 'disabled', {
+        get: function() { return true; },
+        set: function() { return; },
+        configurable: false
+    });
+}
+
 // Inicializa a exibição do limite ao carregar a página
 document.addEventListener('DOMContentLoaded', () => {
+    // Verifica se está em modo anônimo e bloqueia o botão
+    const modoAnonimo = isModoAnonimo();
+    
+    if (modoAnonimo) {
+        // Bloqueia o botão de forma permanente
+        bloquearBotaoAnonimo();
+        
+        // Exibe mensagem de erro
+        exibirErro('⚠️ Este aplicativo não funciona em janela anônima/privada. Por favor, use uma janela normal do navegador para utilizar o aplicativo.');
+        
+        // Oculta o campo de código de ativação também
+        const codigoContainer = document.getElementById('codigoAtivacaoContainer');
+        if (codigoContainer) {
+            codigoContainer.style.display = 'none';
+        }
+        
+        // Bloqueia todos os campos do formulário
+        const inputs = document.querySelectorAll('#sorteioForm input, #sorteioForm select, #sorteioForm button[type="submit"]');
+        inputs.forEach(input => {
+            if (input.id !== 'btnGerar') {
+                input.disabled = true;
+            }
+        });
+        
+        // Verificações periódicas para garantir que o botão permaneça bloqueado
+        setInterval(() => {
+            if (isModoAnonimo()) {
+                bloquearBotaoAnonimo();
+            }
+        }, 500);
+        
+        // Usa MutationObserver para detectar tentativas de habilitar o botão
+        if (btnGerar) {
+            const observer = new MutationObserver((mutations) => {
+                mutations.forEach((mutation) => {
+                    if (mutation.type === 'attributes' && mutation.attributeName === 'disabled') {
+                        if (!btnGerar.disabled && isModoAnonimo()) {
+                            bloquearBotaoAnonimo();
+                        }
+                    }
+                });
+            });
+            
+            observer.observe(btnGerar, {
+                attributes: true,
+                attributeFilter: ['disabled', 'class']
+            });
+        }
+        
+        // Não inicializa o resto se estiver em modo anônimo
+        return;
+    }
+    
     // Inicializações básicas
     atualizarExibicaoLimite();
     atualizarStatusCodigo();

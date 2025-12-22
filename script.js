@@ -1100,7 +1100,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Botões de limpar campo
     // IMPORTANTE: Esta função apenas limpa os valores dos campos do formulário.
     // Ela NÃO afeta o contador de gerações (STORAGE_KEY_CONTADOR), que é mantido no localStorage
-    // e só é resetado após 24 horas ou quando o usuário clica em "Limpar Dados" no rodapé.
+    // e só é resetado após 24 horas. O botão "Limpar Dados" também NÃO reseta o contador.
     document.querySelectorAll('.btn-limpar-campo').forEach(btn => {
         btn.addEventListener('click', () => {
             const campoId = btn.dataset.campo;
@@ -1195,13 +1195,37 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
-    // Limpar todos os dados
+    // Limpar campos preenchidos (não limpa contador de gerações)
     const btnLimparDados = document.getElementById('btnLimparDados');
     if (btnLimparDados) {
         btnLimparDados.addEventListener('click', () => {
-            if (confirm('Tem certeza que deseja limpar TODOS os dados? Isso inclui histórico, filtros e configurações.')) {
-                localStorage.clear();
-                location.reload();
+            if (confirm('Tem certeza que deseja limpar todos os campos preenchidos? O contador de gerações será mantido.')) {
+                // Limpa apenas os campos do formulário
+                ['sorteio1', 'sorteio2', 'sorteio3', 'resultadoAtual'].forEach(campoId => {
+                    const input = document.getElementById(campoId);
+                    if (input) {
+                        input.value = '';
+                        atualizarContador(campoId);
+                    }
+                });
+                
+                // Limpa os filtros de números (excluir/incluir)
+                numerosExcluir.clear();
+                numerosIncluir.clear();
+                localStorage.removeItem(STORAGE_KEY_NUMEROS_EXCLUIR);
+                localStorage.removeItem(STORAGE_KEY_NUMEROS_INCLUIR);
+                inicializarFiltrosNumeros();
+                
+                // Oculta resultados e estatísticas
+                resultadoContainer.classList.add('hidden');
+                estatisticasContainer.classList.add('hidden');
+                errorMessage.classList.add('hidden');
+                
+                // IMPORTANTE: NÃO limpa STORAGE_KEY_CONTADOR e STORAGE_KEY_TIMESTAMP
+                // para manter o controle de gerações e bloqueio funcionando
+                
+                // Atualiza a exibição do limite (para garantir que está correta)
+                atualizarExibicaoLimite();
             }
         });
     }

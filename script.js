@@ -23,16 +23,37 @@ const STORAGE_KEY_TEMA = 'lotoFacil_tema';
 const STORAGE_KEY_NUMEROS_EXCLUIR = 'lotoFacil_numeros_excluir';
 const STORAGE_KEY_NUMEROS_INCLUIR = 'lotoFacil_numeros_incluir';
 const STORAGE_KEY_CODIGO_ATIVO = 'lotoFacil_codigo_ativo';
+const STORAGE_KEY_CODIGO_EXPIRACAO = 'lotoFacil_codigo_expiracao';
 
-// Lista de códigos de ativação válidos (cada código pode ser diferente para cada usuário)
-// Você pode adicionar mais códigos aqui ou gerar códigos únicos dinamicamente
-const CODIGOS_VALIDOS = [
-    'ATIVO2024',
-    'LOTOFACIL2024',
-    'COUTI2024',
-    'DESBLOQUEIO2024',
-    'UNLIMITED2024'
-];
+// Lista de códigos de ativação válidos com seus períodos de validade
+// Períodos: 15 dias, 30 dias, 6 meses (180 dias), 1 ano (365 dias)
+const CODIGOS_VALIDOS = {
+    // Códigos de 15 dias
+    'ATIVO15D': 15,
+    'LOTO15D': 15,
+    'PREMIUM15D': 15,
+    
+    // Códigos de 30 dias
+    'ATIVO30D': 30,
+    'LOTO30D': 30,
+    'PREMIUM30D': 30,
+    'COUTI30D': 30,
+    
+    // Códigos de 6 meses (180 dias)
+    'ATIVO6M': 180,
+    'LOTO6M': 180,
+    'PREMIUM6M': 180,
+    'COUTI6M': 180,
+    'UNLIMITED6M': 180,
+    
+    // Códigos de 1 ano (365 dias)
+    'ATIVO1A': 365,
+    'LOTO1A': 365,
+    'PREMIUM1A': 365,
+    'COUTI1A': 365,
+    'UNLIMITED1A': 365,
+    'VIP2024': 365
+};
 
 // Estado global
 let numerosExcluir = new Set(JSON.parse(localStorage.getItem(STORAGE_KEY_NUMEROS_EXCLUIR) || '[]'));
@@ -614,38 +635,93 @@ function incrementarContador(quantidade = 1) {
 }
 
 /**
- * Verifica se o código de ativação está ativo
+ * Verifica se o código de ativação está ativo e não expirado
  */
 function isCodigoAtivo() {
-    return localStorage.getItem(STORAGE_KEY_CODIGO_ATIVO) === 'true';
+    const expiracaoStr = localStorage.getItem(STORAGE_KEY_CODIGO_EXPIRACAO);
+    if (!expiracaoStr) {
+        return false;
+    }
+    
+    const expiracao = parseInt(expiracaoStr, 10);
+    const agora = Date.now();
+    
+    // Se passou da data de expiração, remove e retorna false
+    if (agora > expiracao) {
+        localStorage.removeItem(STORAGE_KEY_CODIGO_ATIVO);
+        localStorage.removeItem(STORAGE_KEY_CODIGO_EXPIRACAO);
+        return false;
+    }
+    
+    return true;
+}
+
+/**
+ * Retorna a data de expiração formatada do código ativo
+ */
+function getCodigoExpiracaoFormatada() {
+    const expiracaoStr = localStorage.getItem(STORAGE_KEY_CODIGO_EXPIRACAO);
+    if (!expiracaoStr) {
+        return null;
+    }
+    
+    const expiracao = parseInt(expiracaoStr, 10);
+    const data = new Date(expiracao);
+    return data.toLocaleDateString('pt-BR', { 
+        day: '2-digit', 
+        month: '2-digit', 
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+}
+
+/**
+ * Calcula os dias restantes até a expiração
+ */
+function getDiasRestantes() {
+    const expiracaoStr = localStorage.getItem(STORAGE_KEY_CODIGO_EXPIRACAO);
+    if (!expiracaoStr) {
+        return 0;
+    }
+    
+    const expiracao = parseInt(expiracaoStr, 10);
+    const agora = Date.now();
+    const diferenca = expiracao - agora;
+    
+    if (diferenca <= 0) {
+        return 0;
+    }
+    
+    return Math.ceil(diferenca / (1000 * 60 * 60 * 24)); // Converte para dias
 }
 
 /**
  * Ativa um código de ativação
  * @param {string} codigo - Código a ser validado
- * @returns {boolean} - Retorna true se o código for válido
+ * @returns {object} - Retorna { sucesso: boolean, dias: number } ou { sucesso: false }
  */
 function ativarCodigo(codigo) {
     if (!codigo || codigo.trim() === '') {
-        return false;
+        return { sucesso: false };
     }
     
     const codigoLimpo = codigo.trim().toUpperCase();
     
     // Verifica se o código está na lista de códigos válidos
-    if (CODIGOS_VALIDOS.includes(codigoLimpo)) {
+    const diasValidade = CODIGOS_VALIDOS[codigoLimpo];
+    
+    if (diasValidade) {
+        const agora = Date.now();
+        const expiracao = agora + (diasValidade * 24 * 60 * 60 * 1000); // Adiciona os dias em milissegundos
+        
         localStorage.setItem(STORAGE_KEY_CODIGO_ATIVO, 'true');
-        return true;
+        localStorage.setItem(STORAGE_KEY_CODIGO_EXPIRACAO, expiracao.toString());
+        
+        return { sucesso: true, dias: diasValidade };
     }
     
-    return false;
-}
-
-/**
- * Desativa o código de ativação
- */
-function desativarCodigo() {
-    localStorage.removeItem(STORAGE_KEY_CODIGO_ATIVO);
+    return { sucesso: false };
 }
 
 /**
@@ -742,20 +818,31 @@ function atualizarStatusCodigo() {
     const codigoInput = document.getElementById('codigoAtivacao');
     const codigoStatus = document.getElementById('codigoStatus');
     const btnAtivar = document.getElementById('btnAtivar');
+    const codigoContainer = document.getElementById('codigoAtivacaoContainer');
     
-    if (!codigoInput || !codigoStatus || !btnAtivar) return;
+    if (!codigoInput || !codigoStatus || !btnAtivar || !codigoContainer) return;
     
     if (isCodigoAtivo()) {
-        codigoStatus.textContent = '✅ Código ativado - Jogos ilimitados!';
+        const diasRestantes = getDiasRestantes();
+        const expiracaoFormatada = getCodigoExpiracaoFormatada();
+        
+        if (diasRestantes > 0) {
+            codigoStatus.textContent = `✅ Código ativo - Jogos ilimitados! Expira em ${diasRestantes} dia(s) (${expiracaoFormatada})`;
+        } else {
+            codigoStatus.textContent = `✅ Código ativo - Jogos ilimitados! Expira em ${expiracaoFormatada}`;
+        }
+        
         codigoStatus.className = 'codigo-status codigo-ativo';
         codigoInput.disabled = true;
         codigoInput.value = 'Código Ativo';
-        btnAtivar.textContent = 'Desativar';
-        btnAtivar.classList.add('btn-desativar');
+        codigoInput.style.display = 'none';
+        btnAtivar.style.display = 'none';
     } else {
         codigoStatus.textContent = '';
         codigoStatus.className = 'codigo-status hidden';
         codigoInput.disabled = false;
+        codigoInput.style.display = 'block';
+        btnAtivar.style.display = 'block';
         if (codigoInput.value === 'Código Ativo') {
             codigoInput.value = '';
         }
@@ -1281,27 +1368,35 @@ document.addEventListener('DOMContentLoaded', () => {
     const codigoInput = document.getElementById('codigoAtivacao');
     if (btnAtivar && codigoInput) {
         btnAtivar.addEventListener('click', () => {
-            if (isCodigoAtivo()) {
-                // Desativa o código
-                desativarCodigo();
+            // Tenta ativar o código
+            const codigo = codigoInput.value;
+            const resultado = ativarCodigo(codigo);
+            
+            if (resultado.sucesso) {
                 atualizarStatusCodigo();
                 atualizarExibicaoLimite();
-                exibirErro('Código desativado. Limite de gerações restaurado.');
-            } else {
-                // Tenta ativar o código
-                const codigo = codigoInput.value;
-                if (ativarCodigo(codigo)) {
-                    atualizarStatusCodigo();
-                    atualizarExibicaoLimite();
-                    exibirErro('✅ Código ativado com sucesso! Jogos ilimitados disponíveis.');
-                    setTimeout(() => {
-                        errorMessage.classList.add('hidden');
-                    }, 3000);
-                } else {
-                    exibirErro('❌ Código inválido. Verifique e tente novamente.');
-                    codigoInput.value = '';
-                    codigoInput.focus();
+                
+                let mensagem = `✅ Código ativado com sucesso! Jogos ilimitados por ${resultado.dias} dia(s).`;
+                if (resultado.dias === 15) {
+                    mensagem = `✅ Código ativado com sucesso! Jogos ilimitados por 15 dias.`;
+                } else if (resultado.dias === 30) {
+                    mensagem = `✅ Código ativado com sucesso! Jogos ilimitados por 30 dias.`;
+                } else if (resultado.dias === 180) {
+                    mensagem = `✅ Código ativado com sucesso! Jogos ilimitados por 6 meses.`;
+                } else if (resultado.dias === 365) {
+                    mensagem = `✅ Código ativado com sucesso! Jogos ilimitados por 1 ano.`;
                 }
+                
+                exibirErro(mensagem);
+                setTimeout(() => {
+                    errorMessage.classList.add('hidden');
+                }, 4000);
+                
+                codigoInput.value = '';
+            } else {
+                exibirErro('❌ Código inválido. Verifique e tente novamente.');
+                codigoInput.value = '';
+                codigoInput.focus();
             }
         });
         

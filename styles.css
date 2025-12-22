@@ -1443,8 +1443,8 @@ body.theme-dark .main-content {
 /* Footer */
 .footer {
     margin-top: 30px;
-    color: white;
-    opacity: 0.8;
+    color: #000000;
+    opacity: 0.9;
     font-size: 0.9rem;
 }
 
@@ -1466,7 +1466,7 @@ body.theme-dark .main-content {
     background: rgba(255, 255, 255, 0.2);
     border: 2px solid rgba(255, 255, 255, 0.3);
     border-radius: 8px;
-    color: white;
+    color: #000000;
     cursor: pointer;
     font-weight: 600;
     transition: all 0.2s;

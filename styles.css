@@ -1686,6 +1686,14 @@ body.theme-dark .grafico-frequencia-container {
     background: #374151;
 }
 
+body.theme-dark .estatistica-box-title {
+    color: #000000;
+}
+
+body.theme-dark .analises-title {
+    color: #000000;
+}
+
 body.theme-dark .historico-jogo {
     background: #4a5568;
 }

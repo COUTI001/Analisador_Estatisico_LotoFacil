@@ -89,8 +89,8 @@
                 <div class="form-group">
                     <div class="label-row">
                         <label for="resultadoAtual" class="label">
-                            <span class="label-number">✓</span>
-                            Resultado do Jogo Atual (15 números, separados por vírgula)
+                            <span class="label-number">4</span>
+                            Sorteio 4 (15 números, separados por vírgula)
                         </label>
                         <span class="contador-numeros" id="contador4">0/15</span>
                         <button type="button" class="btn-limpar-campo" data-campo="resultadoAtual" title="Limpar campo">🗑️</button>
@@ -100,7 +100,7 @@
                         id="resultadoAtual" 
                         class="input"
                         placeholder="Ex: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15"
-                        aria-label="Resultado do jogo atual, digite 15 números separados por vírgula"
+                        aria-label="Sorteio 4, digite 15 números separados por vírgula"
                     >
                     <div class="seletor-numeros" data-target="resultadoAtual"></div>
                 </div>
@@ -122,11 +122,24 @@
                         <span class="label-number">🎲</span>
                         Quantidade de Jogos a Gerar
                     </label>
-                    <select id="quantidadeJogos" class="select-box" aria-label="Selecione quantidade de jogos">
-                        <option value="1">1 Jogo</option>
-                        <option value="2">2 Jogos</option>
-                        <option value="3">3 Jogos</option>
-                    </select>
+                    <div class="contador-jogos-wrapper">
+                        <button type="button" class="btn-contador btn-contador-menos" id="btnMenosJogos" aria-label="Diminuir quantidade">
+                            <span>−</span>
+                        </button>
+                        <input 
+                            type="number" 
+                            id="quantidadeJogos" 
+                            class="input-contador-jogos" 
+                            value="1" 
+                            min="1" 
+                            max="15"
+                            aria-label="Quantidade de jogos"
+                            readonly
+                        >
+                        <button type="button" class="btn-contador btn-contador-mais" id="btnMaisJogos" aria-label="Aumentar quantidade">
+                            <span>+</span>
+                        </button>
+                    </div>
                 </div>
 
                 <div class="form-group avancado-section">
@@ -167,8 +180,7 @@
                 <h3 class="instrucoes-title">📖 Como Funciona</h3>
                 <div class="instrucoes-content">
                     <ol class="instrucoes-lista">
-                        <li>Preencha os <strong>3 últimos sorteios</strong> da Loto Fácil (15 números cada). Você pode digitar os números separados por vírgula ou usar os <strong>botões numéricos</strong> abaixo de cada campo para seleção visual.</li>
-                        <li>Informe o <strong>resultado do jogo atual</strong> (último sorteio realizado) com 15 números.</li>
+                        <li>Preencha os <strong>4 últimos sorteios</strong> da Loto Fácil (15 números cada). Você pode digitar os números separados por vírgula ou usar os <strong>botões numéricos</strong> abaixo de cada campo para seleção visual.</li>
                         <li>Escolha o <strong>modo de geração</strong>: Balanceado (padrão), Conservador (prioriza frequência) ou Agressivo (prioriza números frios).</li>
                         <li>Selecione a <strong>quantidade de jogos</strong> que deseja gerar.</li>
                         <li><strong>Opcional:</strong> Use as <strong>Opções Avançadas</strong> para excluir ou incluir números específicos na geração.</li>
@@ -176,7 +188,7 @@
                     </ol>
                     
                     <div class="instrucoes-algoritmo">
-                        <p><strong>Algoritmo:</strong> O sistema analisa os padrões dos últimos sorteios, priorizando números que não foram sorteados no resultado atual e que apareceram com maior frequência nos sorteios anteriores. O modo selecionado ajusta os pesos do algoritmo para diferentes estratégias.</p>
+                        <p><strong>Algoritmo:</strong> O sistema analisa os padrões dos últimos sorteios, priorizando números que não foram sorteados no Sorteio 4 e que apareceram com maior frequência nos sorteios anteriores. O modo selecionado ajusta os pesos do algoritmo para diferentes estratégias.</p>
                     </div>
                     
                     <div class="instrucoes-funcionalidades">
@@ -228,8 +240,8 @@
                 <div class="resultado-info">
                     <p class="info-text">
                         <span class="info-icon">ℹ️</span>
-                        Sugestão baseada em números não sorteados no resultado atual 
-                        e frequência acima da média nos últimos 3 sorteios.
+                        Sugestão baseada em números não sorteados no Sorteio 4 
+                        e frequência acima da média nos últimos 4 sorteios.
                     </p>
                 </div>
             </div>

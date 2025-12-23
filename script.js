@@ -1149,6 +1149,40 @@ document.addEventListener('DOMContentLoaded', () => {
     inicializarSeletoresNumericos();
     inicializarFiltrosNumeros();
     
+    // Contador de quantidade de jogos
+    const quantidadeJogosInput = document.getElementById('quantidadeJogos');
+    const btnMaisJogos = document.getElementById('btnMaisJogos');
+    const btnMenosJogos = document.getElementById('btnMenosJogos');
+    
+    function atualizarBotoesContador() {
+        const valor = parseInt(quantidadeJogosInput.value, 10);
+        btnMenosJogos.disabled = valor <= 1;
+        btnMaisJogos.disabled = valor >= 15;
+    }
+    
+    if (quantidadeJogosInput && btnMaisJogos && btnMenosJogos) {
+        // Botão de aumentar
+        btnMaisJogos.addEventListener('click', () => {
+            const valorAtual = parseInt(quantidadeJogosInput.value, 10);
+            if (valorAtual < 15) {
+                quantidadeJogosInput.value = valorAtual + 1;
+                atualizarBotoesContador();
+            }
+        });
+        
+        // Botão de diminuir
+        btnMenosJogos.addEventListener('click', () => {
+            const valorAtual = parseInt(quantidadeJogosInput.value, 10);
+            if (valorAtual > 1) {
+                quantidadeJogosInput.value = valorAtual - 1;
+                atualizarBotoesContador();
+            }
+        });
+        
+        // Atualiza estado inicial dos botões
+        atualizarBotoesContador();
+    }
+    
     // Atualiza contadores dos campos existentes
     ['sorteio1', 'sorteio2', 'sorteio3', 'resultadoAtual'].forEach(campoId => {
         const input = document.getElementById(campoId);

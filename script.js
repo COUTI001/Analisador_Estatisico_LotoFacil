@@ -768,6 +768,11 @@ form.addEventListener('submit', (e) => {
                 
                 exibirJogos(listaJogos);
                 exibirEstatisticas(tresSorteios);
+                
+                // Reabilita o botão após gerar os jogos com sucesso
+                btnGerar.disabled = false;
+                btnGerar.querySelector('.btn-text').textContent = 'Gerar Jogos';
+                btnGerar.classList.remove('btn-bloqueado');
             } catch (error) {
                 exibirErro(error.message);
                 // Reabilita o botão em caso de erro

@@ -680,6 +680,9 @@ body.theme-dark .funcionalidades-lista kbd {
     border-radius: 16px;
     border: 2px solid rgba(17, 153, 142, 0.2);
     animation: slideDown 0.5s ease-out;
+    overflow-x: visible;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .estatisticas-title {
@@ -1057,6 +1060,8 @@ body.theme-dark .main-content {
     background: white;
     border-radius: 16px;
     box-shadow: var(--shadow-md);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 .grafico-title {
@@ -1073,6 +1078,8 @@ body.theme-dark .main-content {
     height: 200px;
     gap: 5px;
     padding: 10px;
+    min-width: 100%;
+    box-sizing: border-box;
 }
 
 .bar-container {
@@ -1482,8 +1489,36 @@ body.theme-dark .main-content {
         grid-template-columns: 1fr;
     }
 
+    .estatisticas-container {
+        padding: 20px 15px;
+        overflow-x: visible;
+    }
+
+    .grafico-frequencia-container {
+        padding: 15px;
+        margin-left: -15px;
+        margin-right: -15px;
+        border-radius: 0;
+        overflow-x: auto;
+    }
+
     .grafico-frequencia {
         height: 150px;
+        gap: 3px;
+        padding: 8px;
+        min-width: 800px;
+    }
+
+    .bar-container {
+        min-width: 0;
+    }
+
+    .bar-label {
+        font-size: 0.7rem;
+    }
+
+    .bar-freq {
+        font-size: 0.65rem;
     }
 
     .modal-content {
@@ -1544,16 +1579,40 @@ body.theme-dark .main-content {
         font-size: 0.75rem;
     }
 
+    .estatisticas-container {
+        padding: 15px 10px;
+        overflow-x: visible;
+    }
+
+    .grafico-frequencia-container {
+        padding: 12px;
+        margin-left: -10px;
+        margin-right: -10px;
+        overflow-x: auto;
+    }
+
+    .grafico-title {
+        font-size: 1.1rem;
+        margin-bottom: 15px;
+    }
+
     .grafico-frequencia {
         height: 120px;
+        gap: 2px;
+        padding: 6px;
+        min-width: 700px;
+    }
+
+    .bar-container {
+        min-width: 0;
     }
 
     .bar-label {
-        font-size: 0.65rem;
+        font-size: 0.6rem;
     }
 
     .bar-freq {
-        font-size: 0.6rem;
+        font-size: 0.55rem;
     }
 }
 

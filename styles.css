@@ -1664,4 +1664,62 @@ body.theme-dark .historico-jogo {
     background: #4a5568;
 }
 
+/* Tema Escuro - Instruções e Informações */
+body.theme-dark .instrucoes-container {
+    background: linear-gradient(135deg, #374151 0%, #2d3748 100%);
+    border-color: rgba(17, 153, 142, 0.3);
+}
+
+body.theme-dark .instrucoes-lista li {
+    background: #4a5568;
+    color: var(--text-primary);
+}
+
+body.theme-dark .instrucoes-lista li strong {
+    color: #4fd1c7;
+}
+
+body.theme-dark .instrucoes-algoritmo {
+    background: linear-gradient(135deg, #234e52 0%, #2c7a7b 100%);
+    color: var(--text-primary);
+}
+
+body.theme-dark .instrucoes-algoritmo strong {
+    color: #4fd1c7;
+}
+
+body.theme-dark .instrucoes-funcionalidades {
+    background: linear-gradient(135deg, #2c5282 0%, #2a4f6e 100%);
+    color: var(--text-primary);
+}
+
+body.theme-dark .instrucoes-funcionalidades h4 {
+    color: #90cdf4;
+}
+
+body.theme-dark .funcionalidades-lista strong {
+    color: #90cdf4;
+}
+
+body.theme-dark .aviso-container {
+    background: linear-gradient(135deg, #742a2a 0%, #63171b 100%);
+    border-color: #e53e3e;
+}
+
+body.theme-dark .aviso-title {
+    color: #fc8181;
+}
+
+body.theme-dark .aviso-content {
+    color: var(--text-primary);
+}
+
+body.theme-dark .aviso-content strong {
+    color: #fc8181;
+}
+
+body.theme-dark .info-text {
+    color: var(--text-primary);
+}
+
 

@@ -881,6 +881,7 @@ body.theme-dark .main-content {
     aspect-ratio: 1;
     border: 2px solid #e2e8f0;
     background: white;
+    color: var(--text-primary);
     border-radius: 8px;
     font-weight: 700;
     cursor: pointer;
@@ -894,9 +895,12 @@ body.theme-dark .main-content {
 }
 
 .btn-numero-seletor.selecionado {
-    background: var(--primary-gradient);
-    color: white;
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    color: white !important;
     border-color: #11998e;
+    border-width: 3px;
+    box-shadow: 0 0 0 2px rgba(17, 153, 142, 0.2), 0 2px 4px rgba(17, 153, 142, 0.3);
+    transform: scale(1.05);
 }
 
 .btn-numero-seletor:disabled {
@@ -960,6 +964,7 @@ body.theme-dark .main-content {
     aspect-ratio: 1;
     border: 2px solid var(--border-color);
     background: white;
+    color: var(--text-primary);
     border-radius: 8px;
     font-weight: 700;
     cursor: pointer;
@@ -974,8 +979,11 @@ body.theme-dark .main-content {
 
 .btn-numero-filtro.ativo {
     background: linear-gradient(135deg, #f5576c 0%, #f093fb 100%);
-    color: white;
+    color: white !important;
     border-color: #f5576c;
+    border-width: 3px;
+    box-shadow: 0 0 0 2px rgba(245, 87, 108, 0.2), 0 2px 4px rgba(245, 87, 108, 0.3);
+    transform: scale(1.05);
 }
 
 .btn-limpar-filtros {
@@ -1646,6 +1654,24 @@ body.theme-dark .btn-numero-filtro {
     background: #4a5568;
     color: var(--text-primary);
     border-color: var(--border-color);
+}
+
+body.theme-dark .btn-numero-seletor.selecionado {
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    color: white !important;
+    border-color: #11998e;
+    border-width: 3px;
+    box-shadow: 0 0 0 2px rgba(17, 153, 142, 0.3), 0 2px 4px rgba(17, 153, 142, 0.4);
+    transform: scale(1.05);
+}
+
+body.theme-dark .btn-numero-filtro.ativo {
+    background: linear-gradient(135deg, #f5576c 0%, #f093fb 100%);
+    color: white !important;
+    border-color: #f5576c;
+    border-width: 3px;
+    box-shadow: 0 0 0 2px rgba(245, 87, 108, 0.3), 0 2px 4px rgba(245, 87, 108, 0.4);
+    transform: scale(1.05);
 }
 
 body.theme-dark .modal-content {
